@@ -1,0 +1,94 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>Memory Allocation From Stack</h3>
+              <p><b>Description</b>: An introduction of memory allocation from procedure frame</p>
+              <p><b>Keywords</b>: Memory Allocator, stack</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+my code: https://github.com/chillancezen/ZeldaOS/blob/master/memory/malloc.c#L276
+
+Allocating memory from the procedure stack is much more efficient and like any other pre-allocated
+space, the space will be freed when procedure returns. the principle is simple: push the stack downwards
+for a length. the user should be aware: after you allocate memory from stack, you can not operate more
+of instruction-level push-pops which spans the allocated space.
+
+with x86(x86_64), it's easy to do the stack space preservation(pseudo code):
+   size_to_alloc = rounded(size_to_alloc);
+   asm: %RSP -= size_to_alloc;
+
+
+but what if you are going to realize the stack allocation in a C language function? this becomes a
+little more complex because it involves another procedure invocation.
+
+for a typical procedure invocation with SystemV ABI calling covention, we have:
+   push   %rbp
+   movq   %rsp, %rbp
+   ... ... ...
+   movq   %rbp, %rsp
+   popq   %rbp
+   retq
+
+the last two instructions before 'retq' can be shortened to 'leaveq'. before procedure returns,
+if we hornor the calling convention, the last chance to modify the caller's stack pointer is
+'movq   %rbp, %rsp', and after return, the %RBP is restored to the caller's one  but %RSP is
+modified to an extended one.
+
+next I will give a figure on how I do it.
+    +-------------+ +-------------+                            +-------------+
+    |             | |             |                            |             |
+    |             | |             |                            |             |
+    | caller's RSP| |             |                            |             |
+    | +---------+ | +-------------+                            |             |
+    |             | |     RIP     | +--------------+           |             |
+    |             | +-------------+                |           |             |
+    |             | |caller's RBP | +----------------+         |             |
+    |             | +-------------+ <------------+ | |         |  +-------+  |
+    |             | |             |  allocated PTR | |         |  |-------|  |
+    |             | |             |       +        | |         |  |-------|  |
+    |             | |             |       |        | |         |  |-------|  |
+    |             | |             |       v        | |         |  |-------|  |
+    |             | |             | Length of alloc| |         |  |-------|  |
+    |             | |             |       ^        | |         |  |-------|  |
+    |             | |             |       |        | |         |  |-------|  |
+    |             | |             |       |        | |         |  |-------|  |
+    |             | |             | +-----+------+ | |         |  |-------|  |
+    |             | |             | |copied RIP  +<+ |         |  |-------|  |
+    |             | |             | +------------+   |         |  |-------|  |
+    |             | |             | |copied RBP  +<--+         |  |-------|  |
+    |             | |             | +------------+             |  +-------+  |
+    |             | |             | |            | <---------+ |caller's RSP |
+    +-------------+ +-------------+ +------------+ mangled RBP +-------------+
+
+                                    PROC rerturns:
+                                    RAX := allocated memory pointer
+                                    RSP := mangled RBP
+                                    RBP := caller's RBP
+
+
+the core algorithm is to move the caller's calling stub to a lower place, and return to
+the caller. but the caller's %RSP is modified by the callee. 
+
+Reference:
+1: http://man7.org/linux/man-pages/man3/alloca.3.html
+2: https://docs.microsoft.com/en-us/cpp/build/stack-usage?view=vs-2019
+        </pre> 
+        
+</body>
+</html>
+

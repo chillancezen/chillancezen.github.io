@@ -3,169 +3,37 @@
 <html lang="en">
 
 <head>
-    <title>Jie Zheng's Home Page</title>
+    <title>Welcome to Jie Zheng's blog</title>
     <meta charset="UTF-8">
     <meta name="keywords" content="Jie Zheng">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <div id="w">
         <header class="clearfix">
             <div id="info">
-              <h2>Jie Zheng</h2>
-              <p>As a computer nerd, I am always interested in the cutting-edge and low-level technologies: Kernel/Arch/Virtualization/Networking</p>
-              <p><a href="mailto:jzheng.bjtu@hotmail.com">Email</a> <a href="https://github.com/chillancezen">Github</a> <a href="https://www.linkedin.com/in/jie-zheng-00366b112">Linkedin</a> <a href="blog.html">Blog</a></p>
+              <p>This is my blog homepage recording low-level technologies: Kernel/Arch/Virtualization/Networking</p>
+              <p><a href="mailto:jzheng.bjtu@hotmail.com">Email</a> <a href="https://github.com/chillancezen">Github</a>
+                 <a href="aboutme.html">About Me</a></p>
           </div>        
 
         </header>
         
-        <hr>
+        <hr>   
+        <table cellspacing="10" >
+                <tr>
+                    <td valign="top">Oct 2nd, 2019</td>
+                    <td>IO framework emulation in Intel VT-x</td>
+                </tr>
+                <tr>
+                    <td valign="top">Sep 27th, 2019</td>
+                    <td><a href="memory_allocation_from_stack.html">Memory Allocation From Stack</a></td>
+                </tr>
+                <tr>
+                    <td valign="top">Sep 26th, 2019</td>
+                    <td><a href="linux_dynamic_linking_in_elf_format.html">Dynamic Linking in Linux</a></td>
+                </tr>
+        </table>
         
-        <h2>Education Background</h2>
-        <div style="margin-top: 10px">
-            <table cellspacing="10" >
-                <tr>
-                    <td valign="top">Sep 2014 - Jun 2016</td>
-                    <td> <b>M. Eng.</b> in Wireless Communication(Engineering) </td>
-                    <td>Beijing Jiaotong University</td>
-                </tr>
-                <tr>
-                    <td> Sep 2009 - Jun 2013 </td>
-                    <td> <b> B. Eng.</b> in Mathematics and Information Security </td>
-                    <td>Beijing Jiaotong University</td>
-                </tr>
-            </table>
-        </div>
-
-        <hr>
-        <h2> Work Experience </h2>
-        <div style="margin-top: 10px">
-            <table cellspacing="10" >
-                <tr>
-                    <td nowrap valign="top">Sep 2017 - present</td>
-                    <td> <b>VMware NSBU Beijing Site: Member of Technical Staff</b></td>
-                    <td> <b>Beijing</b></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                            <li>Did bugfix for customer-found-defect and QE found regression issues of vSphere networking configuration(both vSphere traditional and NSX-T backed).</li>
-                            <li>Took ownership of feature requests for vSphere networking and ESXi local control plane of NSX-T networking.</li>
-                            <li>Collaborative effort for projects which aims to enhance ESXi VM&Networking management lifecycles.</li>
-                            <li>VMware RADIO demo: <a href="https://raw.githubusercontent.com/chillancezen/DEPRECATED-e3datapath/leaf_and_spine/doc/e3net-vision.pdf"> pdf1</a>
-                                and <a href="https://raw.githubusercontent.com/chillancezen/DEPRECATED-e3datapath/leaf_and_spine/doc/e3net-fabric-2nd-presentation.pdf">pdf2</a></li>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td>Jul 2016 – Aug 2017</td>
-                    <td> <b>UnitedStack - The startup private cloud service provider: Networking Engineer</b></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <li>Sought workaround for issues found by customer: do troubleshooting for Neutron services and plugins.</li>
-                        <li>Developed a stateless neutron native load balancer as part of team work.</li>
-                        <li>Realized features: cisco’s vector packet processing like pluggable framework, lockless configuration plane with user space RCU, stacked L2 and L3 processing for VLAN and VXLAN overlay.</li>
-                        <li>With Intel XL710 Dual 40G Nic, we had overall throughput at rate > 19Mpps with 64-byte packets saturating the physical link.</li>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Oct 2015 – Apr 2016</td>
-                    <td> <b>Juniper Networks SSBU Beijing Site: Intern</b></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <li>Wrote automated test and verification script for Juniper SRX.</li>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <hr>
-        <h2> Hobby Projects </h2>
-        <div style="margin-top: 10px">
-            <table cellspacing="10" >
-            <tr>
-                <td>Jan 2019 – Present</td>
-                <td> <b>ZeldaOS.x86_64: A 64-bit kernel as a bare metal hypervisor</b></td>
-                <td> <b>Beijing</b></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <li>A home brew 64-bit Intel VT-x based bare metal <b>hypervisor</b>.</li>
-                    <li>Capable of running 64-bit long mode guest OS with sereral peripheral emulations.</li>
-                    <li>Demo can be found <a href="https://asciinema.org/a/5qJG94cGhMy1M0PTzHGqruEGS">here</a> and 
-                        <a href="https://github.com/chillancezen/ZeldaOS.x86_64"> git </a></li>
-                </td>
-            </tr>
-            <tr>
-                <td nowrap>May 2018 – Dec 2018</td>
-                <td> <b>ZeldaOS: A 32-bit posix.1 compliant OS/kernel</b></td>
-                <td> <b>Beijing</b></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <li>A home brew 32-bit monolithic Unix-like kernel which provides basic multi-tasking execution environment for <a href = "https://github.com/chillancezen/ZeldaOS/tree/master/application">various userworld applications.</a></li>
-                    <li>Demo can be found <a href="https://asciinema.org/a/NBDYjYFvSPpNcRcULcq8YirjE" target="_blank">here</a>
-                        and <a href="https://github.com/chillancezen/ZeldaOS">git</a>
-                    </li>
-                </td>
-            </tr>
-            </table>
-        </div>
-       <hr>
-        <div style="margin-top: 10px">
-            <h2> Presentations </h2>
-            <table cellspacing="10" >
-            <tr>
-                <td nowrap>Jun 2018</td>
-                <td> <b>DPDK Summit 2018 PRC Beijing</b></td>
-                <td> <b>Beijing</b></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <li><b>Topic</b>: Link-Level Network Slicing with DPDK</li>
-                    <li><b>Abstract</b>: As NFV intrinsically demands, the virtual network must be featured with higher bandwidth and lower latency even on top of COTS hardware, to improve the network efficiency meanwhile maintaining high availability and scalability, we do layer 2 network virtualization with dedicated network nodes along with infrastructure network, to coordinate them in a link-level fabric view, a controller cluster which employs smart layer 3 techniques is introduced. Through working together, it provides the ability to slice the quantified network resource, this session we will focus on how DPDK fuels the data path.  
-</li>
-                    <li><b>Keywords</b>: MPLS over Ethernet, E-LINE, E-LAN, Dijkstra's algorithm, Prim's algorithm </li>
-                    <li><b>Links</b>: <a href="https://www.dpdk.org/wp-content/uploads/sites/35/2018/09/Jie-Zheng-jiezheng-dpdk-summit-2018-beijing.pptx">jiezheng-dpdk-summit-2018-beijing.pptx</a></li>
-                </td>
-            </tr>
-            <tr>
-                <td nowrap>Jun 2017</td>
-                <td> <b>DPDK Summit 2017 PRC Shanghai</b></td>
-                <td> <b>Shanghai</b></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <li><b>Topic</b>: A high-speed PMD towards LXC networking</li>
-                    <li><b>Abstract</b>:  A memory-copy-based poll mode driver using Intel vectorized instruction sets SSE/AVX</li>
-                    <li><b>Keywords</b>: LXC, Networking, PMD, SIMD </li>
-                    <li><b>Links</b>: <a href="https://www.dpdk.org/wp-content/uploads/sites/35/2018/06/DPDK-China2017-Zheng-High-Speed-DPDK-PMD-LXC.pdf">Jie-Zheng-High-Speed-DPDK-PMD-LXC.pdf</a></li>
-                </td>
-            </tr>
-            </table>
-        </div>
-        <hr>
-        <div>
-            <h2> Miscellaneous </h2>
-            <table cellspacing="10" >
-                <tr>
-                    <td><b>Common language:</b></td> <td>Mandarin and English</td></tr> <tr>
-                    <td><b>Programming skills:</b></td> <td>C&GAS/Python and basic data structures and algorithms</td></tr> <tr>
-                    <td><b>Interests:</b></td><td>ongoing knowledge of x86 ISA and virtualization of networking</td></tr> <tr>
-                    <td><b>Hobbies:</b></td><td>jogging/video games/history/music and movies</td>
-                </tr>
-            </table>
-        </div>
-</div>
 </body>
 </html>
 
