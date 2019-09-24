@@ -1,0 +1,106 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>Linux Dynamic Linking in Elf format</h3>
+              <p><b>Description</b>: This is to breifly introduce how dynamic linking works in Linux</p>
+              <p><b>Keywords</b>: Dynamic Linking, ELF</p>
+              <p><a href="blog.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+The Demo: https://github.com/chillancezen/Pandora/tree/master/relocation_table
+
+With relocatable shared library, it's able to reduce massive room for your program as more than one program can
+share the library code while maintaining their own data exclusivly. every process has non-fixed address, it means
+even multiple processes are using the same library, their addresses in each process address space diff. that's
+what virtual addressing is able to do.
+
+the this requires the code and data are relocatable, in other words, the code and data are position independent: they
+can be loaded at any place in process space as long as they are loaded in alignment and granted the right permission.
+so what's relocatable code?
+    In a word, addressing in relocatable code is PC(program-counter)-relativle, the PC in x86_64 is %RIP. Let's give
+    an example:
+    #cat -n foo.c
+     1    int baz = 100;
+     2
+     3    int
+     4    foo(void)
+     5    {
+     6        return baz;
+     7    } 
+    compile the code to generate a shared library: libfoo.so
+    #gcc -fPIC -shared -o libfoo.so foo.c
+    0000000000000655 <foo>:
+        655:    55                       push   %rbp
+        656:    48 89 e5                 mov    %rsp,%rbp
+        659:    48 8b 05 78 09 20 00     mov    0x200978(%rip),%rax        # 200fd8 <baz@@Base-0x40>
+        660:    8b 00                    mov    (%rax),%eax
+        662:    5d                       pop    %rbp
+        663:    c3                       retq
+    %RIP register is utilized as the base register and an immediate is given as the offset to refer to the
+    memory location which stores the address of baz. the native memory location is 0x200978 + 0x659 = 0x200fd8, let's
+    explain later what exactly the memory location is.
+from the code above, we know no matter where the code and code are loaded, the code can run as expected because it
+does not use absolute addressing.
+
+
+the data the code above refers to actually resides in .got section, when loaded, it has R&W permission.
+note in shared library, the symbols which it exports itself are regarded as sort of relocatable symbols which
+are going to be patched. so we could say, the .got is an indirection table, which must be patched at runtime.
+the diagram below give the view of how the patching goes on:
+          .got                   .rela.dyn
+        +-------+               +-------+   +-+  .dynsym
+        |       |               |       |   |   +----------+
+        |       |               |       |   |   |          |
+        |       |               |       |   |   |          |
+    +-> | +---+ |  patching     |       |   |   +----------+
+    |   |       | <---------+   |       | + |
+    |   |       |           |   |       |   |
+    |   |       |           |   |       |   |
+    |   |       |           |   |       |   |   symbols in other
+    |   |       |           |   |       |   |   libraries
+    |   |       |           |   +-------+   +-+             
+    |   |       |           |                                
+    |   |       |           |   +                            +
+    |   |       |           |   +-------------+--------------+
+    |   |       |           |                 |
+    +   +-------+           +-----------------+
+
+    mov offset(rip)
+              (PC relative addressing)
+
+the .got does not have regular format, so we don't manipulate them directly, instead, we have relocation table which
+is stored usually in .rela.dyn. the rela stands for "relocation with addend", the rela entry contains the offset and 
+the symbol index, with whatever way, we know the value(address) of the symbol, JUST store the in-memory address of that
+symbol to the in-memory location. Let's take an example:
+    we are going to patch the variable: baz. the library is loaded to the base address: base(libfoo.so)
+    through the .rela.dyn relocation tbale, we get the offset of variable:baz, let's say: offset(baz).
+    so we have in-mmeory location of the indirect variable:baz: base(libfoo.so) + offset(baz).
+    as of the content to store in that location, it depends on whether the symbol is originated from the local library,
+    if YES, the value to store is base(libfoo.so) + valure(symbol), otherwise, the value to stroe is queried from other
+    preloaded library.
+
+the code address relocation is a bit different from data address relocation, the code addresses indirection is in
+.got.plt and the relocation table for code addresses is in .rela.plt. plt stands for procedure linkage table.
+for every remote procedure, we have a stub function which jumps into the indirected procedured in .got.plt.
+
+Reference:
+1. http://man7.org/linux/man-pages/man5/elf.5.html
+        </pre> 
+        
+</body>
+</html>
+
