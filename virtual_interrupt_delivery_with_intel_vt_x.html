@@ -23,7 +23,7 @@
         <pre>
 Let's first introduce how interrupts are delivered in i386 and x86_64. 
 
-per my understanding, the devices' interrupt pins are connected to PIC(programmable interrupt controller, e.g. Intel 8253) in legacy computers
+per my understanding, the devices' interrupt pins are connected to PIC(programmable interrupt controller, e.g. Intel 8259) in legacy computers
 and APIC(advanced programmable interrupt controller) in recent computers. I found my DELL workstation support both. through configuration, The
 PIC or APIC is able to delivery an interrupt to the processor at proper moment(the vector is not masked and the processor's interrupt flag is
 clear). please see Chapter 10 for more of APIC.
@@ -58,9 +58,24 @@ restore the stack and privilege level according what's onto the stack.
 
 
 Next I am going to talk about how I deliver the interrupt in my hypervisor.
-[TBD]
+first I had to emulate an interrupt controller, like I said before, the Intel 8259 chiip is the controller that x86 computers used to have. I did that
+emulation inside my hypervisor. it's quite simple to have the minimum function set emulated with PIO channel: the offset of vector and the mask of the pin.
+you can find the details in file vm_monitor/device_8259pic.c. note with 8259(also with APIC), the end of interrupt must be acknowledged my guest by writing
+the command port. this is all about interrupt controller emulation.
 
-when the processor works in 32bit protected mode, 
+with VT-x, hypervisor is able to inject any interrupt vector at any time irregardless of the IF of RFLAGS in vmx non-root mode, that's to say, the IF
+is cleared in guest OS and you inject the interrupt, the guest OS is to respond to the interrupt, but this is definitely not the right behavior. what the
+guest OS expects is when the global interrupt gate:IF is shut down, it never receives interrupts.
+
+Fortunately, vt-x provides the interrupt window mechanism: vt-x will let you know when it's proper to inject your interrupts for the guest.
+the bit 2 of primary processor-based vm-execution controls determines whether the interrupt window causes a vm exit: once set, a VM exit occurs 
+at the beginning of any instruction if RFLAGS.IF = 1 and there are no other blocking of interrupts. it's absolutely safe to inject your interrupts.
+you should always disable interrupt window when there is no interrupts to deliver otherwise it keeps unnecessary trapping all the time.
+
+when we are sure to deliver an interrupt, we should also query the PIC interrupt pin mask to see whether it's masked. and also add the offset to the 
+vector. to actually inject the interrupt, we should write the vm-entry interrupt-information field in vmx root mode, see more for the format at SDM 24.8.3.
+as the conslusion, I would say, the correct way to inject the interrupt is to wait until interrupt window is open and for external interrupt source,
+we also check the PIC interrupt pin mask to ensure the interrupt delivery is legitimate. 
 
 Reference:
 1: https://github.com/chillancezen/ZeldaOS/blob/master/x86/interrupt_entry.s
