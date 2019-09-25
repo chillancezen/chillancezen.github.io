@@ -1,0 +1,71 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>IO framework emulation with Intel VT-x</h3>
+              <p><b>Description</b>: This article shortly describes how PIO and MMIO are implemented in my hypervisor</p>
+              <p><b>Keywords</b>: Hypervisor, VT-x, PIO, MMIO</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+There are two IO channels in x86_64: PIO and MMIO. MMIO is the memory mapped IO channel with which you can use generic data
+instructions to access IO devices registers/memory except that these memory areas have different paging requirements: for example,
+the device memory area is non-cacheable.any write to the area is flushed immediately. PIO has seperate address space and exclusive
+IO instructions. as far as I know, other ISA like ARM does not have PIO, all the devices are mapped in memory address space.
+
+as you may guess, x86_64 has exclusive IO instruction, the vt-x could intercepts IO instructions and cause a vm exit. the bit 24 and
+25 of primary processor based execute control is controlling the IO instruction behaviors(see 24.6.2.): when unconditional IO exiting bit(bit 24)
+is set, bit 25 is ignored, any IO instructions can cause vm exit. when conditional IO exiting(bit 25) is set, two bitmaps should be set to give vmx 
+indication on how which port address causes a vm exit while others do not. the format of the IO bitmap can be found at 24.6.4.
+the basic reason for IO exits is 30. and the qualification can be found in Table 27.5 in SDM.
+
+MMIO in vt-x is much more complex, as a matter of fact, vt-x does not provide any native methods which lets your guest trap into vmx when your guest
+is accessing the so called MMIO memory area. instead, at vmx EPT layer(assume we are exploting vt-x Extended Page Table for address translation) vmx
+does not distinguish the system memory and device memory. it even does not trap into vmx if the ept is filled as good as it expects.
+the EPT entry is completely different from normal table entry: it has no bit filed entry: present. every entry takes 8 bytes. bit 0 is read access and
+bit 1 is write access, you can find full format of the ept entry at 28.2.2.
+normally, if an entry is marked as non-readable and non-writable, access to the target area cause EPT violation exit(reason number 48). and if
+the entry is marked as non-readable but writable, memory access to that area will cause EPT misconfiguration exit(reason number 49).
+
+now we know how EPT behaves. we are going to fill entries for the MMIO regions as non-readable and writable intentionally. thus vmx traps get EPT
+misconfiguration basic reason, we can examine the devices associated that address, and then do IO work for the device.
+
+a very typical case for MMIO is 16-color video device emulation: any writes to the physical page: 0xb8000 will refect on the video monitor. 
+the reference implementation in my hypervisor is in vm_monitor/device_video.c. there is one exception: the video base address is set 0x1000b8000
+because I reserve the low 1MB memory space for my guest image.
+as you can see, the video device initialization process is quite straightforward:
+    setup_io_memory(vm->regions.ept_pml4_base, VIDEO_BUFFER_PAGE_FRAME);
+    struct mmio_operation video_mmio = {
+        .addr_low = VIDEO_BUFFER_PAGE_FRAME,
+        .addr_high = VIDEO_BUFFER_PAGE_FRAME + PAGE_SIZE_4K,
+        .mmio_read = video_buffer_mmio_read,
+        .mmio_write = video_buffer_mmio_write
+    };
+    register_mmio_operation(&video_mmio);
+
+one problem that makes me headache is in EPT misconfiguration exit, nothing about the instruction is given to you except for the guest physical address.
+so you have to decode the instruction yourself to determine the source/destionation operand and the instruction length with which we can advance guest RIP.
+I did several basic move instructions in vm_monitor/vmx_instruction_decoding.c. 
+
+
+Reference:
+1: Intel SDM volume 3.
+2: https://wiki.osdev.org/X86-64_Instruction_Encoding
+        </pre> 
+        
+</body>
+</html>
+
