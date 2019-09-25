@@ -1,0 +1,72 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>Virtual Interrupt Delivery with Intel VT-x</h3>
+              <p><b>Description</b>: The article is to tell how interrupts works in x86_64 and how interrupts are delivered in my hypervisor</p>
+              <p><b>Keywords</b>: vt-x, interrupt delivery</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+Let's first introduce how interrupts are delivered in i386 and x86_64. 
+
+per my understanding, the devices' interrupt pins are connected to PIC(programmable interrupt controller, e.g. Intel 8253) in legacy computers
+and APIC(advanced programmable interrupt controller) in recent computers. I found my DELL workstation support both. through configuration, The
+PIC or APIC is able to delivery an interrupt to the processor at proper moment(the vector is not masked and the processor's interrupt flag is
+clear). please see Chapter 10 for more of APIC.
+
+when an interrupt is sent to processor, how does processor react?
+well, it depends on the mode and previlege level the processor is working in. the table below is given to describe the actions taken under
+different circumstances:
+    +----------------------------------------------------------------------------------------+
+    |mode             |previlege Level| actions                                              |
+    +----------------------------------------------------------------------------------------+
+    | 32bit protected |               |1.perform stack switch                                |
+    | mode/64bit com- |               |2.push original ESP/SS                                |
+    | patible mode    |PL 3           |3.push original EFLAGS/EIP/CS                         |
+    |                 |               |4.push error code if there is any                     |
+    |                 +----------------------------------------------------------------------+
+    |                 |               |1.DO NOT push original SS/ESP                         |
+    |                 |PL 0           |2.push original EFLAGS/EIP/CS                         |
+    |                 |               |3.push error code if any                              |
+    +----------------------------------------------------------------------------------------+
+    |64-bit long mode |PL0/PL3        |1.perform stack switch for inter-PL cases             |
+    |                 |               |2.push RSP/SS unconditionally                         |
+    |                 |               |3.push RFLAGS/RIP/CS                                  |
+    |                 |               |4.push error code if any                              |
+    +-----------------+----------------------------------------------------------------------+
+when the steps above are done, the processor transfers to the address specified in IDT(Interrupt Description Table) which usually has the length 256.
+each IDT entry contains the address with which the RIP register will be loaded. in order to save to restore processor state from interrupt context.
+additional work must be done before going further to other routines. Reference [1] is the work done for 32 protected mode and reference [2] is for 64-bit
+long mode.
+restoring processor state is the reverse order, it means we should restores the general purpose registers and then restore the registers which are
+automatically pushed during interrupt occurs, but the rest of work is done by issuing the one signle instruction 'iret'. the 'iret' instruction will
+restore the stack and privilege level according what's onto the stack.
+
+
+Next I am going to talk about how I deliver the interrupt in my hypervisor.
+[TBD]
+
+when the processor works in 32bit protected mode, 
+
+Reference:
+1: https://github.com/chillancezen/ZeldaOS/blob/master/x86/interrupt_entry.s
+2: https://github.com/chillancezen/ZeldaOS.x86_64/blob/master/x86_64/interrupt_service_routine.S
+        </pre> 
+        
+</body>
+</html>
+

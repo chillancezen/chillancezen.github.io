@@ -58,7 +58,7 @@ as you can see, the video device initialization process is quite straightforward
 
 one problem that makes me headache is in EPT misconfiguration exit, nothing about the instruction is given to you except for the guest physical address.
 so you have to decode the instruction yourself to determine the source/destionation operand and the instruction length with which we can advance guest RIP.
-I did several basic move instructions in vm_monitor/vmx_instruction_decoding.c. 
+I decoded several basic move instructions in vm_monitor/vmx_instruction_decoding.c. 
 
 
 Reference:
