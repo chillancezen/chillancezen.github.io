@@ -58,7 +58,7 @@ restore the stack and privilege level according what's onto the stack.
 
 
 Next I am going to talk about how I deliver the interrupt in my hypervisor.
-first I had to emulate an interrupt controller, like I said before, the Intel 8259 chiip is the controller that x86 computers used to have. I did that
+first is that I emulate an interrupt controller, like I said before, the Intel 8259 chiip is the controller that x86 computers used to have. what I did that
 emulation inside my hypervisor. it's quite simple to have the minimum function set emulated with PIO channel: the offset of vector and the mask of the pin.
 you can find the details in file vm_monitor/device_8259pic.c. note with 8259(also with APIC), the end of interrupt must be acknowledged my guest by writing
 the command port. this is all about interrupt controller emulation.

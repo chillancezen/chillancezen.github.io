@@ -1,0 +1,149 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>Signal Handling in ZeldaOS</h3>
+              <p><b>Description</b>: This article tells how signaling is implemented in ZeldaOS</p>
+              <p><b>Keywords</b>: Signal Handling, ZeldaOS</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+Signal is a mechanism for kenrel to interrupt userworld task, like the way the device interrupts
+processor, kernel is able to interrupt a task in a asynchronous way. Linux supports posix real-time
+signals, however, in my ZeldaOS, only reliable signals are supported, that means the signals may be
+delayed a bit. 
+
+when kernel is signalling the task, signals are pending until being scheduled next
+time irregardless of the status of that task: when the task is running in privilege level 3, the signal
+is postponed until the context is switched to kernel world(privilege level 0) and right at the moment
+when being about to switch back to user space.
+
+it requires that the code of user context must give up proceeding when signal is pending, a very typical code
+snippet in ZeldaOS is when the task is sleeping:
+    int32_t
+    sleep(uint32_t milisecond)
+    {
+        int ret = OK;
+        struct timer_entry timer;
+        memset(&timer, 0x0, sizeof(timer));
+        ASSERT(current);
+        timer.state = timer_state_idle;
+        timer.time_to_expire = jiffies + milisecond;
+        timer.priv = current;
+        timer.callback = sleep_callback;
+        register_timer(&timer);
+        transit_state(current, TASK_STATE_INTERRUPTIBLE);
+        yield_cpu();
+        if (signal_pending(current)) {
+            cancel_timer(&timer);
+            ret = -ERR_INTERRUPTED;
+        }
+        ASSERT(timer_detached(&timer));
+
+        return ret;
+    }
+
+as you can see from the above code, it's quite simple to let the a task sleep for a bit time, what we have to do
+is put a timer into global timer scheduling queue, thus when the timer expires, the task can be waken up.
+but when the signal is pending, the task can also be awake, the task have to examine whether the task is
+signalled. being signalled is not that expected in normal process, but we must handle this.
+
+you may wonder why the task must quit its kernel context before signals are processed, that's becasue processing signals
+may change the flow of normal context, for example, it can terminate the task and there should be no on-stack data structures
+being refereneced by kernel subordinary components. for example, the timer entry is allocated from task PL0 stack, if the
+task happens to be terminated without normally quitting kernel context, the kernel timer subsystem can reference invalid memory
+area, this is absolutely not expected.
+
+as for the stack on which signal context code runs, I prepare a dedicated stack so it avoid the complexity of stack management and
+also reduces the chance to damage the normal stack. the below diagram shows the stack usage and signal processing flow.
+      stack@PL3             stack@PL0
+        |                     |
+        |                     |
+        |  transit(PL3-->PL0) |
+        | ------------------> |
+        |                     |
+        |                     | <----------save(task->cpu)
+        |                     |
+        |                     |
+        |                     | push(task->cpu)
+        |                         |
+        |                         | <----save(task->cpu)
+        |                                               |push(task->cpu)
+        |                   (Nested Intra-PL0 trap)     |     save(task->cpu)
+        |                                               |pop(task->cpu)
+        |                         |
+        |                     | pop(task->cpu)
+        |  transit(PL0-->PL3) |  --------+           (Back to normal context)
+        v <------------------ v          |   <------------------------------+
+                                         |                                  |
+    sig_stack@PL3         sig_stack@PL0  |                                  |
+        +                     +          |                                  |
+        |                     |          v                                  |
+        |                     |         task->signal_pending                |
+        |                     |            |         (SIG_ACTION_EXIT)------+
+        |                     |            |         (SIG_ACTION_STOP)------|
+        |                     |            |         (SIG_ACTION_IGNORE)----+
+        |(Frame: return       |  <---------+                                |
+        | address to PL0 space)       (SIG_ACTION_USER)                     |
+        |                     |                                             |
+        |  transit(PL0-->PL3) |                                             |
+        | <------------------ |                                             |
+        |                     |                                             |
+        |  transit(PL3-->PL0) |                                             |
+        | ------------------> |                                             |
+        v                     v --------------------------------------------+
+ 
+
+from scheduler's perspective, the signal-pending is examined at the exit from kernel world to user world, if the signal is
+pending and the action is to directed to registered user code, it then switchs to the signal handler which runs at previlege
+level 3, after the handler is totally completed, it must swtch back to kernel user and the normal process resumes. but how?
+
+there are several ways to do it as far as I know, for example: we could direct the post-signal-handler to the code area which
+which contains an dedicated system call to terminate the signal handler calling. in ZeldaOS, I took the other way:
+          signal handler()      signal dedicated stack
+            +-------+           +---------+
+            |-------|           |         |
+            |-------|           |         |
+            |-------|           |         |
+            |-------|           +---------+
+            |-------|           |  EIP    |(fabricated EIP
+            |-------| +-------> +---------+ pointing to the
+            |-------| |         |  EBP    | return_from_pl3_signal_handler() in PL0)
+            +-------+ |         +---------+
+    +-----+ | ret   | |         |   .     |
+    |       +-------+ |         |   .     |
+    |                 |         |   .     |
+    |     EIP <= signal_handler |   .     |
+    |                           +---------+
+    |                           |         |
+    |
+    |
+    +--------------->After the instruction 'ret', the return address is poped from
+                     the stack, however the memory address is not accessible in PL3
+                     so we encounter the paging permission fault, but we know it is
+                     caused by signal handling if we compare the linear address of
+                     paging fault with the return_from_pl3_signal_handler
+
+this is a little tricky because we fill the EIP of last frame to the memory address which is inaccessible in privilege
+level 3, and we exploit paging mechanism to intercept the event of signal handler.
+
+Reference:
+1. http://man7.org/linux/man-pages/man7/signal.7.html
+        </pre> 
+        
+</body>
+</html>
+
