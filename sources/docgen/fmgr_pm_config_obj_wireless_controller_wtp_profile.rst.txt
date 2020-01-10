@@ -79,7 +79,7 @@ Parameters
  <li><span class="li-head">login-passwd-change</span> - Change or reset the administrator password of a managed WTP, FortiAP or AP (yes, default, or no, default = no). <span class="li-normal">type: str</span>  <span class="li-normal">choices: [no, yes, default]</span> </li>
  <li><span class="li-head">max-clients</span> - Maximum number of stations (STAs) supported by the WTP (default = 0, meaning no client limitation). <span class="li-normal">type: int</span> </li>
  <li><span class="li-head">name</span> - WTP (or FortiAP or AP) profile name. <span class="li-normal">type: str</span> </li>
- <li><span class="li-head">poe-mode</span> - Set the WTP, FortiAP, or AP's PoE mode. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [auto, 8023af, 8023at, power-adapter]</span> </li>
+ <li><span class="li-head">poe-mode</span> - Set the WTP, FortiAP, or APs PoE mode. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [auto, 8023af, 8023at, power-adapter]</span> </li>
  <li><span class="li-head">split-tunneling-acl</span> - No description for the parameter <span class="li-normal">type: array</span> <ul class="ul-self">
  <li><span class="li-head">dest-ip</span> - Destination IP and mask for the split-tunneling subnet. <span class="li-normal">type: str</span> </li>
  <li><span class="li-head">id</span> - ID. <span class="li-normal">type: int</span> </li>
@@ -141,47 +141,48 @@ Examples
       ansible_httpapi_validate_certs: False
       ansible_httpapi_port: 443
    tasks:
-    - name: send request to /pm/config/obj/wireless-controller/wtp-profile
+
+    - name: REQUESTING /PM/CONFIG/OBJ/WIRELESS-CONTROLLER/WTP-PROFILE
       fmgr_pm_config_obj_wireless_controller_wtp_profile:
          method: <value in [add, set, update]>
          url_params:
             adom: <value in [none, global, custom dom]>
          params:
-            - 
-               data: 
-                - 
-                     allowaccess: 
-                      - <value in [https, ssh, snmp, ...]>
+            -
+               data:
+                 -
+                     allowaccess:
+                       - <value in [https, ssh, snmp, ...]>
                      ap-country: <value in [AL, DZ, AR, ...]>
                      ble-profile: <value of string>
                      comment: <value of string>
-                     control-message-offload: 
-                      - <value in [ebp-frame, aeroscout-tag, ap-list, ...]>
-                     deny-mac-list: 
-                      - 
+                     control-message-offload:
+                       - <value in [ebp-frame, aeroscout-tag, ap-list, ...]>
+                     deny-mac-list:
+                       -
                            id: <value of integer>
                            mac: <value of string>
                      dtls-in-kernel: <value in [disable, enable]>
-                     dtls-policy: 
-                      - <value in [clear-text, dtls-enabled, ipsec-vpn]>
+                     dtls-policy:
+                       - <value in [clear-text, dtls-enabled, ipsec-vpn]>
                      energy-efficient-ethernet: <value in [disable, enable]>
                      ext-info-enable: <value in [disable, enable]>
                      handoff-roaming: <value in [disable, enable]>
                      handoff-rssi: <value of integer>
                      handoff-sta-thresh: <value of integer>
-                     ip-fragment-preventing: 
-                      - <value in [tcp-mss-adjust, icmp-unreachable]>
+                     ip-fragment-preventing:
+                       - <value in [tcp-mss-adjust, icmp-unreachable]>
                      led-schedules: <value of string>
                      led-state: <value in [disable, enable]>
                      lldp: <value in [disable, enable]>
-                     login-passwd: 
-                      - <value of string>
+                     login-passwd:
+                       - <value of string>
                      login-passwd-change: <value in [no, yes, default]>
                      max-clients: <value of integer>
                      name: <value of string>
                      poe-mode: <value in [auto, 8023af, 8023at, ...]>
-                     split-tunneling-acl: 
-                      - 
+                     split-tunneling-acl:
+                       -
                            dest-ip: <value of string>
                            id: <value of integer>
                      split-tunneling-acl-local-ap-subnet: <value in [disable, enable]>
@@ -189,27 +190,28 @@ Examples
                      tun-mtu-downlink: <value of integer>
                      tun-mtu-uplink: <value of integer>
                      wan-port-mode: <value in [wan-lan, wan-only]>
-    - name: send request to /pm/config/obj/wireless-controller/wtp-profile
+
+    - name: REQUESTING /PM/CONFIG/OBJ/WIRELESS-CONTROLLER/WTP-PROFILE
       fmgr_pm_config_obj_wireless_controller_wtp_profile:
          method: <value in [get]>
          url_params:
             adom: <value in [none, global, custom dom]>
          params:
-            - 
+            -
                attr: <value of string>
-               fields: 
-                - 
-                   - <value in [allowaccess, ap-country, ble-profile, ...]>
-               filter: 
-                - <value of string>
+               fields:
+                 -
+                    - <value in [allowaccess, ap-country, ble-profile, ...]>
+               filter:
+                 - <value of string>
                get used: <value of integer>
                loadsub: <value of integer>
                option: <value in [count, object member, datasrc, ...]>
-               range: 
-                - <value of integer>
-               sortings: 
-                - 
-                     \{attr_name\}: <value in [1, -1]>
+               range:
+                 - <value of integer>
+               sortings:
+                 -
+                     varidic.attr_name: <value in [1, -1]>
 
 
 
@@ -271,7 +273,7 @@ Common return values are documented: https://docs.ansible.com/ansible/latest/ref
  <li> <span class="li-return"> login-passwd-change </span> - Change or reset the administrator password of a managed WTP, FortiAP or AP (yes, default, or no, default = no). <span class="li-normal">type: str</span>  </li>
  <li> <span class="li-return"> max-clients </span> - Maximum number of stations (STAs) supported by the WTP (default = 0, meaning no client limitation). <span class="li-normal">type: int</span>  </li>
  <li> <span class="li-return"> name </span> - WTP (or FortiAP or AP) profile name. <span class="li-normal">type: str</span>  </li>
- <li> <span class="li-return"> poe-mode </span> - Set the WTP, FortiAP, or AP's PoE mode. <span class="li-normal">type: str</span>  </li>
+ <li> <span class="li-return"> poe-mode </span> - Set the WTP, FortiAP, or APs PoE mode. <span class="li-normal">type: str</span>  </li>
  <li> <span class="li-return"> split-tunneling-acl </span> - No description for the parameter <span class="li-normal">type: array</span> <ul class="ul-self">
  <li> <span class="li-return"> dest-ip </span> - Destination IP and mask for the split-tunneling subnet. <span class="li-normal">type: str</span>  </li>
  <li> <span class="li-return"> id </span> - ID. <span class="li-normal">type: int</span>  </li>
