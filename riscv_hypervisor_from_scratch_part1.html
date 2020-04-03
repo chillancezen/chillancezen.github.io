@@ -1,0 +1,140 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>RISC-V Emulation From Scratch - Part I: Dynamic Instruction Translation</h3>
+              <p><b>Synopsis</b>: This article series tells what's inside my risc-v hypervisor</p>
+              <p><b>Keywords</b>: risc-v, virtualzation, dynamic binary translation </p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+My hypervisor (https://github.com/chillancezen/Zelda.RISCV.Emulator) utilizes dynamic binary translation(DBT) technique to emulate risc-v instructions over
+x86_64. the core function is to dynamically translate in-memory risc-v instructions to x86_64 instruction representation.
+
+This is the first time for me to do something with DBT, from the very beginning, efficiency is not my goal, intead, my top priority is to make
+it wor. Fortunately, it works just fine after much effort in debug and resolutin eventually.
+
+I) Register Representation
+   we have 32 + 1 general purpose registers in risc-v ISA, but we have less regsters in x86_64(R[A-D]X, RSI, RDI, RBP, RSP, R[8-15]). so during translation
+   process, we can not simpliy map all risc-v registers to x86_64 registers. As far as I know, some hyperisors like rv8 map mostly-used risc-v registers to 
+   x86_64 registers while leaving others in memory.
+
+   In my hypervisor, all registers(32 GPRs plus PC) are in memory, so at anytime a hart that is accessing a GPR is actually accessing in-memory registers shadow.
+   there are many control and status registers(CSR) which are also represented as memory profiles except that they are accessing using CSR instructions
+
+2) Translation Process
+   our hypervisor doesn't support `C` extension, we only accpet instructions of fixed length, aka, 4 bytes.
+   every riscv instruction have its fixed template, we define these template and copy the template to proper position in translation cache. 
+   the following diagram shows you are the translation is structured.
+
+             RISC-V                              Translation Cache:
+             instructions stream                 (x86_64 Position Independent Code template)
+
+                +--------+                        +--------------------------------------------------------------------------------------------------+
+                |  ...   |                        |                                                                                                  |
+                |  ...   |                        |    402ed0:   8b 05 1e 00 00 00       mov    0x1e(%rip),%eax        # 402ef4 immediate location.  |
+                |00b72023|                        |    402ed6:   8b 15 1c 00 00 00       mov    0x1c(%rip),%edx        # 402ef8 rd index.            |
+    +-----------+fff00713|                        |    402edc:   c1 e0 0c                shl    $0xc,%eax                                            |
+    |           |84e580e3|                        |    402edf:   c1 e2 02                shl    $0x2,%edx                                            |
+    |           |80000cb7|                        |    402ee2:   4c 01 fa                add    %r15,%rdx                                            |
+    |           |fffccb93|                        |    402ee5:   89 02                   mov    %eax,(%rdx)                                          |
+    |           |837b0ae3|                        |    402ee7:   41 c7 07 00 00 00 00    movl   $0x0,(%r15)                                          |
+    |           |001b0b13|                        |    402eee:   41 83 06 04             addl   $0x4,(%r14)                                          |
+    | +---------+04090063|                        |    402ef2:   eb 08                   jmp    402efc 	         # PC relative addressing            |
+    | |         |03805e63|                        | ++ 402ef4:   cc                      int3                      to next instruction segment...    |
+    | | +-------+fffff7b7|                        | |  402ef5:   cc                      int3                      or jump out to VMM(like VMEXIT in VT-x)
+    | | | +-----|75c78793|              runtime   | |  402ef6:   cc                      int3                                                        |
+    | | | | +---+008787b3|              patch  +---->  402ef7:   cc                      int3                                                        |
+    | | | | |   |  ...   |                        | |  402ef8:   cc                      int3                                                        |
+    | | | | |   |  ...   |                        | |  402ef9:   cc                      int3                                                        |
+    | | | | |   +--------+                        | |  402efa:   cc                      int3                                                        |
+    | | | | |                                     | ++ 402efb:   cc                      int3                                                        |
+    | | | | |                                     +--------------------------------------------------------------------------------------------------+
+    | | | | |                               +-----+    (instruction segment)                                                                         |
+    | | | | |       address mapping         | +---|    (instruction segment)                                                                         |
+    | | | | |      +------+   +------+      | | +-+    (instruction segment)                                                                         |
+    | | | | |      |      +-->+      +------+ | | +--------------------------------------------------------------------------------------------------+
+    | | | | +------+ ...  |   |      |        | | |    (unconditional jump to VMM)                                                                   |
+    | | | +--------| ...  +-->+      +--------+ | +--------------------------------------------------------------------------------------------------+
+    | | +----------| ...  |   |      +----------+
+    | +------------| ...  +-->+      |
+    +--------------+ ...  |   |      |
+                   |      +-->+      |
+                   +------+   +------+
+
+   after copying the template, we have to patch some location in translation cache, for example, in LUI instruction, we have two parameters: immediate value and rd
+   register. these data are decoded from LUI instruction itself. 
+
+   note that the x86_64 instruction position independent, you can palce them at any locations.
+   
+   every two consecutive risc-v instructions have one x86_64 instruction segment next to another so that we continue to run in translation cache as a whole, 
+   for examples, consecutive arithmetic instructions are always translated one by one and one next to previous one.
+
+   for unconditional jump or branch or other instructions like fence.i, we terminate the translation process and also place a jumper at the end of instruction
+   segment in hope that VMM can determine the jump/branch target later.
+
+   we don make a trace in our translation cache, more specifically, all consecutive arithmetic instructions plus next have-to-terminate instruction make a trace.
+
+   when the translation cahce is full, the translation process flushes the cache, we have 16K translation cache by default. 
+
+2) Run Process
+   another process after translation is to run translated code.
+   below is the flow diagram of how to run the translated code:
+
+                                                                            | (init)
+                                                                            |
+    +---------------------------------------------------------------------+ |
+    |                                                                     | |
+    |       +----------------------+            +-------------------------v-v---------------------------+
+    |       |                      | <------+   | vmresume:                                             |
+    |       | vmm_entry_point:     |        |   |   r15: the address of the hart's registers group      |
+    |       |                      | <----+ |   |   r14: the address of the hart's pc register          |
+    |       |    1: adjust stack   |      | |   |   r13: the value of the hart's translation cache base |
+    |       |    2: do vmexit      |      | |   |   r12: the hartptr.                                   |
+    |       |                      |      | |   |                  + + + + +                            |
+    |       +----------------------+      | |   |                  | | | | | (jump to translation       |
+    |       |                      |      | |   |                  | | | | |  cache)                    |
+    |       | vmexit:              |      | |   +------------------v-v-v-v-v----------------------------+
+    |       |                      |      | |   |                                                       |
+    |       |   1: do translation  |      | |   |             (instruction segment)                     |
+    +-------+   2: do vmresume     |      | |   |             (instruction segment)                     |
+            |                      |      | |   |             (instruction segment)                     |
+            +----------------------+      | |   |             (instruction segment)                     |
+            |                      |      | |   |             (instruction segment)                     |
+            | slow_path            |      | |   |             (instruction segment)                     |
+            |                      |      | +------------+ (jump/branch/fence.i ... jump out)           |
+            |   1: save r12...15   |      |     |             (instruction segment)                     |
+            |   2: do slow_path    | +-----------------------+(instruction segment)                     |
+            |   3: restore r12...15| ^----------------------^ (instruction segment)                     |
+            |                      |      |     |             (instruction segment)                     |
+            +----------------------+      |     |             (instruction segment)                     |
+                                          |     |             (instruction segment)                     |
+                                          +----------------+ (unconditional jump out)                   |
+                                                |                                                       |
+                                                +-------------------------------------------------------+
+
+    translation process is restarted when the next instruction to execute is not in translation cache.  accorss the run process, there are four x86_64
+    registers are reserverd for specical use as you can find in the diagram, and each time before we go furthrt into translation cache code, we fill 
+    these registers with right values.
+
+    the translation cache code can jump out to vmm in certain cases, to avoid stack exhaustion, we have to update the stack to a fixed value, and then do rest
+    of the work: translation the code in need and continue to execute translated code.
+    
+        </pre> 
+        
+</body>
+</html>
+
