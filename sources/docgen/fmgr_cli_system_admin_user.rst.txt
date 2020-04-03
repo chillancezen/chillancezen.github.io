@@ -53,22 +53,22 @@ Parameters
  <li><span class="li-head">ca</span> - PKI user certificate CA (CA name in local). <span class="li-normal">type: str</span> </li>
  <li><span class="li-head">change-password</span> - Enable/disable restricted user to change self password. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [disable, enable]</span>  <span class="li-normal">default: disable</span> </li>
  <li><span class="li-head">dashboard</span> - No description for the parameter <span class="li-normal">type: array</span> <ul class="ul-self">
- <li><span class="li-head">column</span> - Widgets column ID. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
- <li><span class="li-head">diskio-content-type</span> - Disk I/O Monitor widgets chart type. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [util, iops, blks]</span>  <span class="li-normal">default: util</span> </li>
- <li><span class="li-head">diskio-period</span> - Disk I/O Monitor widgets data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [1hour, 8hour, 24hour]</span>  <span class="li-normal">default: 1hour</span> </li>
- <li><span class="li-head">log-rate-period</span> - Log receive monitor widgets data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [2min , 1hour, 6hours]</span> </li>
- <li><span class="li-head">log-rate-topn</span> - Log receive monitor widgets number of top items to display. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [1, 2, 3, 4, 5]</span>  <span class="li-normal">default: 5</span> </li>
- <li><span class="li-head">log-rate-type</span> - Log receive monitor widgets statistics breakdown options. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [log, device]</span>  <span class="li-normal">default: device</span> </li>
+ <li><span class="li-head">column</span> - Widget's column ID. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
+ <li><span class="li-head">diskio-content-type</span> - Disk I/O Monitor widget's chart type. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [util, iops, blks]</span>  <span class="li-normal">default: util</span> </li>
+ <li><span class="li-head">diskio-period</span> - Disk I/O Monitor widget's data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [1hour, 8hour, 24hour]</span>  <span class="li-normal">default: 1hour</span> </li>
+ <li><span class="li-head">log-rate-period</span> - Log receive monitor widget's data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [2min , 1hour, 6hours]</span> </li>
+ <li><span class="li-head">log-rate-topn</span> - Log receive monitor widget's number of top items to display. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [1, 2, 3, 4, 5]</span>  <span class="li-normal">default: 5</span> </li>
+ <li><span class="li-head">log-rate-type</span> - Log receive monitor widget's statistics breakdown options. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [log, device]</span>  <span class="li-normal">default: device</span> </li>
  <li><span class="li-head">moduleid</span> - Widget ID. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">name</span> - Widget name. <span class="li-normal">type: str</span> </li>
  <li><span class="li-head">num-entries</span> - Number of entries. <span class="li-normal">type: int</span>  <span class="li-normal">default: 10</span> </li>
- <li><span class="li-head">refresh-interval</span> - Widgets refresh interval. <span class="li-normal">type: int</span>  <span class="li-normal">default: 300</span> </li>
- <li><span class="li-head">res-cpu-display</span> - Widgets CPU display type. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [average , each]</span>  <span class="li-normal">default: average </span> </li>
- <li><span class="li-head">res-period</span> - Widgets data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [10min , hour, day]</span>  <span class="li-normal">default: 10min </span> </li>
- <li><span class="li-head">res-view-type</span> - Widgets data view type. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [real-time , history]</span>  <span class="li-normal">default: history</span> </li>
- <li><span class="li-head">status</span> - Widgets opened/closed state. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [close, open]</span>  <span class="li-normal">default: open</span> </li>
+ <li><span class="li-head">refresh-interval</span> - Widget's refresh interval. <span class="li-normal">type: int</span>  <span class="li-normal">default: 300</span> </li>
+ <li><span class="li-head">res-cpu-display</span> - Widget's CPU display type. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [average , each]</span>  <span class="li-normal">default: average </span> </li>
+ <li><span class="li-head">res-period</span> - Widget's data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [10min , hour, day]</span>  <span class="li-normal">default: 10min </span> </li>
+ <li><span class="li-head">res-view-type</span> - Widget's data view type. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [real-time , history]</span>  <span class="li-normal">default: history</span> </li>
+ <li><span class="li-head">status</span> - Widget's opened/closed state. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [close, open]</span>  <span class="li-normal">default: open</span> </li>
  <li><span class="li-head">tabid</span> - ID of tab where widget is displayed. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
- <li><span class="li-head">time-period</span> - Log Database Monitor widgets data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [1hour, 8hour, 24hour]</span>  <span class="li-normal">default: 1hour</span> </li>
+ <li><span class="li-head">time-period</span> - Log Database Monitor widget's data period. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [1hour, 8hour, 24hour]</span>  <span class="li-normal">default: 1hour</span> </li>
  <li><span class="li-head">widget-type</span> - Widget type. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [top-lograte, sysres, sysinfo, licinfo, jsconsole, sysop, alert, statistics, rpteng, raid, logrecv, devsummary, logdb-perf, logdb-lag, disk-io, log-rcvd-fwd]</span> </li>
  </ul>
  <li><span class="li-head">dashboard-tabs</span> - No description for the parameter <span class="li-normal">type: array</span> <ul class="ul-self">
@@ -198,134 +198,132 @@ Examples
       ansible_httpapi_validate_certs: False
       ansible_httpapi_port: 443
    tasks:
-
-    - name: REQUESTING /CLI/SYSTEM/ADMIN/USER
+    - name: send request to /cli/system/admin/user
       fmgr_cli_system_admin_user:
          method: <value in [add, set, update]>
          params:
-            -
-               data:
-                 -
-                     adom:
-                       -
+            - 
+               data: 
+                - 
+                     adom: 
+                      - 
                            adom-name: <value of string>
-                     adom-exclude:
-                       -
+                     adom-exclude: 
+                      - 
                            adom-name: <value of string>
-                     app-filter:
-                       -
+                     app-filter: 
+                      - 
                            app-filter-name: <value of string>
                      avatar: <value of string>
                      ca: <value of string>
-                     change-password: <value in [disable, enable] default: 'disable'>
-                     dashboard:
-                       -
+                     change-password: <value in [disable, enable] default: disable>
+                     dashboard: 
+                      - 
                            column: <value of integer default: 0>
-                           diskio-content-type: <value in [util, iops, blks] default: 'util'>
-                           diskio-period: <value in [1hour, 8hour, 24hour] default: '1hour'>
+                           diskio-content-type: <value in [util, iops, blks] default: util>
+                           diskio-period: <value in [1hour, 8hour, 24hour] default: 1hour>
                            log-rate-period: <value in [2min , 1hour, 6hours]>
-                           log-rate-topn: <value in [1, 2, 3, ...] default: '5'>
-                           log-rate-type: <value in [log, device] default: 'device'>
+                           log-rate-topn: <value in [1, 2, 3, ...] default: 5>
+                           log-rate-type: <value in [log, device] default: device>
                            moduleid: <value of integer default: 0>
                            name: <value of string>
                            num-entries: <value of integer default: 10>
                            refresh-interval: <value of integer default: 300>
-                           res-cpu-display: <value in [average , each] default: 'average '>
-                           res-period: <value in [10min , hour, day] default: '10min '>
-                           res-view-type: <value in [real-time , history] default: 'history'>
-                           status: <value in [close, open] default: 'open'>
+                           res-cpu-display: <value in [average , each] default: average >
+                           res-period: <value in [10min , hour, day] default: 10min >
+                           res-view-type: <value in [real-time , history] default: history>
+                           status: <value in [close, open] default: open>
                            tabid: <value of integer default: 0>
-                           time-period: <value in [1hour, 8hour, 24hour] default: '1hour'>
+                           time-period: <value in [1hour, 8hour, 24hour] default: 1hour>
                            widget-type: <value in [top-lograte, sysres, sysinfo, ...]>
-                     dashboard-tabs:
-                       -
+                     dashboard-tabs: 
+                      - 
                            name: <value of string>
                            tabid: <value of integer default: 0>
                      description: <value of string>
                      dev-group: <value of string>
                      email-address: <value of string>
-                     ext-auth-accprofile-override: <value in [disable, enable] default: 'disable'>
-                     ext-auth-adom-override: <value in [disable, enable] default: 'disable'>
+                     ext-auth-accprofile-override: <value in [disable, enable] default: disable>
+                     ext-auth-adom-override: <value in [disable, enable] default: disable>
                      ext-auth-group-match: <value of string>
                      first-name: <value of string>
-                     force-password-change: <value in [disable, enable] default: 'disable'>
+                     force-password-change: <value in [disable, enable] default: disable>
                      group: <value of string>
                      hidden: <value of integer default: 0>
-                     ips-filter:
-                       -
+                     ips-filter: 
+                      - 
                            ips-filter-name: <value of string>
-                     ipv6_trusthost1: <value of string default: '::/0'>
-                     ipv6_trusthost10: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost2: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost3: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost4: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost5: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost6: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost7: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost8: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
-                     ipv6_trusthost9: <value of string default: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'>
+                     ipv6_trusthost1: <value of string default: ::/0>
+                     ipv6_trusthost10: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost2: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost3: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost4: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost5: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost6: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost7: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost8: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
+                     ipv6_trusthost9: <value of string default: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128>
                      last-name: <value of string>
                      ldap-server: <value of string>
-                     meta-data:
-                       -
+                     meta-data: 
+                      - 
                            fieldlength: <value of integer default: 0>
                            fieldname: <value of string>
                            fieldvalue: <value of string>
-                           importance: <value in [optional, required] default: 'optional'>
-                           status: <value in [disabled, enabled] default: 'enabled'>
+                           importance: <value in [optional, required] default: optional>
+                           status: <value in [disabled, enabled] default: enabled>
                      mobile-number: <value of string>
                      pager-number: <value of string>
-                     password:
-                       - <value of string default: 'ENC ODU0NTM3NDg1NTMxMDg0MEm8OIAeHq0agoeKH1cknBy7orKo5c0jSfMSXT+VuqYN+atv8wiI...'>
-                     password-expire:
-                       - <value of string>
+                     password: 
+                      - <value of string default: ENC ODU0NTM3NDg1NTMxMDg0MEm8OIAeHq0agoeKH1cknBy7orKo5c0jSfMSXT+VuqYN+atv8wiIW7W8PMzVMSjUkVEnbEpEW/komaek5rcWGIHzpijPphfS09Vlm0vEArsMz6UNqGxf5qLL/MxjITcW4WPWIFLPTPxZQAMoakc7pn8jNgVL>
+                     password-expire: 
+                      - <value of string>
                      phone-number: <value of string>
-                     policy-package:
-                       -
+                     policy-package: 
+                      - 
                            policy-package-name: <value of string>
-                     profileid: <value of string default: 'Restricted_User'>
+                     profileid: <value of string default: Restricted_User>
                      radius_server: <value of string>
-                     restrict-access: <value in [disable, enable] default: 'disable'>
-                     restrict-dev-vdom:
-                       -
+                     restrict-access: <value in [disable, enable] default: disable>
+                     restrict-dev-vdom: 
+                      - 
                            dev-vdom: <value of string>
-                     rpc-permit: <value in [read-write, none, read] default: 'none'>
-                     ssh-public-key1:
-                       - <value of string>
-                     ssh-public-key2:
-                       - <value of string>
-                     ssh-public-key3:
-                       - <value of string>
+                     rpc-permit: <value in [read-write, none, read] default: none>
+                     ssh-public-key1: 
+                      - <value of string>
+                     ssh-public-key2: 
+                      - <value of string>
+                     ssh-public-key3: 
+                      - <value of string>
                      subject: <value of string>
                      tacacs-plus-server: <value of string>
-                     trusthost1: <value of string default: '0.0.0.0 0.0.0.0'>
-                     trusthost10: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost2: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost3: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost4: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost5: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost6: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost7: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost8: <value of string default: '255.255.255.255 255.255.255.255'>
-                     trusthost9: <value of string default: '255.255.255.255 255.255.255.255'>
-                     two-factor-auth: <value in [disable, enable] default: 'disable'>
-                     user_type: <value in [local, radius, ldap, ...] default: 'local'>
+                     trusthost1: <value of string default: 0.0.0.0 0.0.0.0>
+                     trusthost10: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost2: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost3: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost4: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost5: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost6: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost7: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost8: <value of string default: 255.255.255.255 255.255.255.255>
+                     trusthost9: <value of string default: 255.255.255.255 255.255.255.255>
+                     two-factor-auth: <value in [disable, enable] default: disable>
+                     user_type: <value in [local, radius, ldap, ...] default: local>
                      userid: <value of string>
-                     web-filter:
-                       -
+                     web-filter: 
+                      - 
                            web-filter-name: <value of string>
-                     wildcard: <value in [disable, enable] default: 'disable'>
-
-    - name: REQUESTING /CLI/SYSTEM/ADMIN/USER
+                     wildcard: <value in [disable, enable] default: disable>
+    - name: send request to /cli/system/admin/user
       fmgr_cli_system_admin_user:
          method: <value in [get]>
          params:
-            -
-               fields:
-                 -
-                    - <value in [avatar, ca, change-password, ...]>
-               filter:
-                 - <value of string>
+            - 
+               fields: 
+                - 
+                   - <value in [avatar, ca, change-password, ...]>
+               filter: 
+                - <value of string>
                loadsub: <value of integer>
                option: <value in [count, syntax]>
 
@@ -368,22 +366,22 @@ Common return values are documented: https://docs.ansible.com/ansible/latest/ref
  <li> <span class="li-return"> ca </span> - PKI user certificate CA (CA name in local). <span class="li-normal">type: str</span>  </li>
  <li> <span class="li-return"> change-password </span> - Enable/disable restricted user to change self password. <span class="li-normal">type: str</span>  <span class="li-normal">example: disable</span>  </li>
  <li> <span class="li-return"> dashboard </span> - No description for the parameter <span class="li-normal">type: array</span> <ul class="ul-self">
- <li> <span class="li-return"> column </span> - Widgets column ID. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
- <li> <span class="li-return"> diskio-content-type </span> - Disk I/O Monitor widgets chart type. <span class="li-normal">type: str</span>  <span class="li-normal">example: util</span>  </li>
- <li> <span class="li-return"> diskio-period </span> - Disk I/O Monitor widgets data period. <span class="li-normal">type: str</span>  <span class="li-normal">example: 1hour</span>  </li>
- <li> <span class="li-return"> log-rate-period </span> - Log receive monitor widgets data period. <span class="li-normal">type: str</span>  </li>
- <li> <span class="li-return"> log-rate-topn </span> - Log receive monitor widgets number of top items to display. <span class="li-normal">type: str</span>  <span class="li-normal">example: 5</span>  </li>
- <li> <span class="li-return"> log-rate-type </span> - Log receive monitor widgets statistics breakdown options. <span class="li-normal">type: str</span>  <span class="li-normal">example: device</span>  </li>
+ <li> <span class="li-return"> column </span> - Widget's column ID. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
+ <li> <span class="li-return"> diskio-content-type </span> - Disk I/O Monitor widget's chart type. <span class="li-normal">type: str</span>  <span class="li-normal">example: util</span>  </li>
+ <li> <span class="li-return"> diskio-period </span> - Disk I/O Monitor widget's data period. <span class="li-normal">type: str</span>  <span class="li-normal">example: 1hour</span>  </li>
+ <li> <span class="li-return"> log-rate-period </span> - Log receive monitor widget's data period. <span class="li-normal">type: str</span>  </li>
+ <li> <span class="li-return"> log-rate-topn </span> - Log receive monitor widget's number of top items to display. <span class="li-normal">type: str</span>  <span class="li-normal">example: 5</span>  </li>
+ <li> <span class="li-return"> log-rate-type </span> - Log receive monitor widget's statistics breakdown options. <span class="li-normal">type: str</span>  <span class="li-normal">example: device</span>  </li>
  <li> <span class="li-return"> moduleid </span> - Widget ID. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> name </span> - Widget name. <span class="li-normal">type: str</span>  </li>
  <li> <span class="li-return"> num-entries </span> - Number of entries. <span class="li-normal">type: int</span>  <span class="li-normal">example: 10</span>  </li>
- <li> <span class="li-return"> refresh-interval </span> - Widgets refresh interval. <span class="li-normal">type: int</span>  <span class="li-normal">example: 300</span>  </li>
- <li> <span class="li-return"> res-cpu-display </span> - Widgets CPU display type. <span class="li-normal">type: str</span>  <span class="li-normal">example: average </span>  </li>
- <li> <span class="li-return"> res-period </span> - Widgets data period. <span class="li-normal">type: str</span>  <span class="li-normal">example: 10min </span>  </li>
- <li> <span class="li-return"> res-view-type </span> - Widgets data view type. <span class="li-normal">type: str</span>  <span class="li-normal">example: history</span>  </li>
- <li> <span class="li-return"> status </span> - Widgets opened/closed state. <span class="li-normal">type: str</span>  <span class="li-normal">example: open</span>  </li>
+ <li> <span class="li-return"> refresh-interval </span> - Widget's refresh interval. <span class="li-normal">type: int</span>  <span class="li-normal">example: 300</span>  </li>
+ <li> <span class="li-return"> res-cpu-display </span> - Widget's CPU display type. <span class="li-normal">type: str</span>  <span class="li-normal">example: average </span>  </li>
+ <li> <span class="li-return"> res-period </span> - Widget's data period. <span class="li-normal">type: str</span>  <span class="li-normal">example: 10min </span>  </li>
+ <li> <span class="li-return"> res-view-type </span> - Widget's data view type. <span class="li-normal">type: str</span>  <span class="li-normal">example: history</span>  </li>
+ <li> <span class="li-return"> status </span> - Widget's opened/closed state. <span class="li-normal">type: str</span>  <span class="li-normal">example: open</span>  </li>
  <li> <span class="li-return"> tabid </span> - ID of tab where widget is displayed. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
- <li> <span class="li-return"> time-period </span> - Log Database Monitor widgets data period. <span class="li-normal">type: str</span>  <span class="li-normal">example: 1hour</span>  </li>
+ <li> <span class="li-return"> time-period </span> - Log Database Monitor widget's data period. <span class="li-normal">type: str</span>  <span class="li-normal">example: 1hour</span>  </li>
  <li> <span class="li-return"> widget-type </span> - Widget type. <span class="li-normal">type: str</span>  </li>
  </ul>
  <li> <span class="li-return"> dashboard-tabs </span> - No description for the parameter <span class="li-normal">type: array</span> <ul class="ul-self">

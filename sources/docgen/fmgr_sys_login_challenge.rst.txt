@@ -73,13 +73,12 @@ Examples
       ansible_httpapi_validate_certs: False
       ansible_httpapi_port: 443
    tasks:
-
-    - name: REQUESTING /SYS/LOGIN/CHALLENGE
+    - name: send request to /sys/login/challenge
       fmgr_sys_login_challenge:
          method: <value in [exec]>
          params:
-            -
-               data:
+            - 
+               data: 
                   answer: <value of string>
                   session: <value of string>
 

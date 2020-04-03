@@ -44,19 +44,19 @@ Parameters
  <ul class="ul-self">
  <li><span class="li-head">data</span> - No description for the parameter <span class="li-normal">type: dict</span> <ul class="ul-self">
  <li><span class="li-head">dlp-files-auto-deletion</span> <li><span class="li-head">retention</span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [days, weeks, months]</span>  <span class="li-normal">default: days</span> </li>
- <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
+ <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">status</span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [disable, enable]</span>  <span class="li-normal">default: disable</span> </li>
  <li><span class="li-head">value</span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">log-auto-deletion</span> <li><span class="li-head">retention</span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [days, weeks, months]</span>  <span class="li-normal">default: days</span> </li>
- <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
+ <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">status</span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [disable, enable]</span>  <span class="li-normal">default: disable</span> </li>
  <li><span class="li-head">value</span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">quarantine-files-auto-deletion</span> <li><span class="li-head">retention</span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [days, weeks, months]</span>  <span class="li-normal">default: days</span> </li>
- <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
+ <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">status</span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [disable, enable]</span>  <span class="li-normal">default: disable</span> </li>
  <li><span class="li-head">value</span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">report-auto-deletion</span> <li><span class="li-head">retention</span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [days, weeks, months]</span>  <span class="li-normal">default: days</span> </li>
- <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
+ <li><span class="li-head">runat</span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">status</span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">choices: [disable, enable]</span>  <span class="li-normal">default: disable</span> </li>
  <li><span class="li-head">value</span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">default: 0</span> </li>
  <li><span class="li-head">status-fake</span> - Fake value for the menu to work. <span class="li-normal">type: int</span> </li>
@@ -91,32 +91,31 @@ Examples
       ansible_httpapi_validate_certs: False
       ansible_httpapi_port: 443
    tasks:
-
-    - name: REQUESTING /CLI/SYSTEM/AUTO-DELETE
+    - name: send request to /cli/system/auto-delete
       fmgr_cli_system_auto_delete:
          method: <value in [set, update]>
          params:
-            -
-               data:
-                  dlp-files-auto-deletion:
-                     retention: <value in [days, weeks, months] default: 'days'>
+            - 
+               data: 
+                  dlp-files-auto-deletion: 
+                     retention: <value in [days, weeks, months] default: days>
                      runat: <value of integer default: 0>
-                     status: <value in [disable, enable] default: 'disable'>
+                     status: <value in [disable, enable] default: disable>
                      value: <value of integer default: 0>
-                  log-auto-deletion:
-                     retention: <value in [days, weeks, months] default: 'days'>
+                  log-auto-deletion: 
+                     retention: <value in [days, weeks, months] default: days>
                      runat: <value of integer default: 0>
-                     status: <value in [disable, enable] default: 'disable'>
+                     status: <value in [disable, enable] default: disable>
                      value: <value of integer default: 0>
-                  quarantine-files-auto-deletion:
-                     retention: <value in [days, weeks, months] default: 'days'>
+                  quarantine-files-auto-deletion: 
+                     retention: <value in [days, weeks, months] default: days>
                      runat: <value of integer default: 0>
-                     status: <value in [disable, enable] default: 'disable'>
+                     status: <value in [disable, enable] default: disable>
                      value: <value of integer default: 0>
-                  report-auto-deletion:
-                     retention: <value in [days, weeks, months] default: 'days'>
+                  report-auto-deletion: 
+                     retention: <value in [days, weeks, months] default: days>
                      runat: <value of integer default: 0>
-                     status: <value in [disable, enable] default: 'disable'>
+                     status: <value in [disable, enable] default: disable>
                      value: <value of integer default: 0>
                   status-fake: <value of integer>
 
@@ -137,19 +136,19 @@ Common return values are documented: https://docs.ansible.com/ansible/latest/ref
  <li><span class="li-return">data</span>
  - No description for the parameter <span class="li-normal">type: dict</span> <ul class="ul-self">
  <li> <span class="li-return"> dlp-files-auto-deletion </span> <li> <span class="li-return"> retention </span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">example: days</span>  </li>
- <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
+ <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> status </span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">example: disable</span>  </li>
  <li> <span class="li-return"> value </span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> log-auto-deletion </span> <li> <span class="li-return"> retention </span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">example: days</span>  </li>
- <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
+ <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> status </span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">example: disable</span>  </li>
  <li> <span class="li-return"> value </span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> quarantine-files-auto-deletion </span> <li> <span class="li-return"> retention </span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">example: days</span>  </li>
- <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
+ <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> status </span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">example: disable</span>  </li>
  <li> <span class="li-return"> value </span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> report-auto-deletion </span> <li> <span class="li-return"> retention </span> - Automatic deletion in days, weeks, or months. <span class="li-normal">type: str</span>  <span class="li-normal">example: days</span>  </li>
- <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) oclock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
+ <li> <span class="li-return"> runat </span> - Automatic deletion run at (0 - 23) o'clock. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> status </span> - Enable/disable automatic deletion. <span class="li-normal">type: str</span>  <span class="li-normal">example: disable</span>  </li>
  <li> <span class="li-return"> value </span> - Automatic deletion in x days, weeks, or months. <span class="li-normal">type: int</span>  <span class="li-normal">example: 0</span>  </li>
  <li> <span class="li-return"> status-fake </span> - Fake value for the menu to work. <span class="li-normal">type: int</span>  </li>
