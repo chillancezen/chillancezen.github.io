@@ -21,13 +21,13 @@
         
         <hr>
         <pre>
-In RISC-V, paging is controlled via csr: Supervisor Address Translation and Protection(SATP), it support four paging mode: No paging, sv32, sv39 and sv48.
-they diff in many ways including virtual address width. in rv32, only sv32 paging mode is supported and it's the mode we have impleented in my hypervisor.
+In RISC-V, paging is controlled via csr: Supervisor Address Translation and Protection(SATP), it supports four paging modes: No paging, sv32, sv39 and sv48.
+they diff in many ways including virtual address width. in rv32, only sv32 paging mode is supported and it's the mode we have implemented in my hypervisor.
 
 in sv32, the width of virtual address is 32bit, however, the physical address width is 34 bits, this means we can address physical address range [0 - 16GB], if I
 am not wrong, in x86, only PXE is enabled, addressing range can be greater than 4GB.
 
-in sv32, there are two kinds of pages, 4K pages and 4M megapages. this is very much similar to x86, for 4M pages, there is only one tier of page table while
+in sv32, there are two kinds of pages, 4K pages and 4M megapages. this is very similar to x86, for 4M pages, there is only one tier of page table while
 others have two tiers.
 
 MMU is a necessity in a system which suports virtual memory, mmu consists of translation lookaside buffer (TLB) and pagewalker. 

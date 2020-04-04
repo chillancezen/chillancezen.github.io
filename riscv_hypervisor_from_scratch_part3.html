@@ -1,0 +1,59 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>RISC-V Emulation From Scratch - Part III: Privilege Level and Trap handling</h3>
+              <p><b>Synopsis</b>: This article tells how privilege level and trap are handled in my hypervisor_</p>
+              <p><b>Keywords</b>: privilege level, trap, exception, interrupt</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+there are three privilege modes in risc-v: user, supervisor and machine. user mode has least privilege and machine mode has most privilege.
+A cpu must implements machine mode, and optionally implements user/supervisor mode, user/supervisor can access machine mode resource via SBI by calling ecall.
+
+operation system works in supervisor mode and application works in user mode respectively, my hypervisor_implemented three modes: U/S/M.
+
+
+cpu traps happens when a synchronous exception or an asynchronous interrrupt event must be delivered to cpu, like traps delivery in x86(_64), IDT is a table
+to tell cpu where to jump when it has to, simply jumping to the entry point specified in IDT is not enough, a lot of work is done by cpu, so does risc-v cpu.
+
+
+by default all traps happen in m-mode, but SSE can delegate certain trap to lower privilege level, for example, a paging fault from supervisor/user is delegated
+to supervisor mode. the CSR: mdeleg and ideleg control the delegation behavior.
+
+the steps the hypervisor follows are:
+    1).  determine which privilege mode the trap is from and which privilege mode the trap is going to be delivered by querying ideleg and mdeleg csrs, let's
+         denote it x.
+    2). csr:xepc is written with current pc of running hart.
+    3). csr:xcause is written with casue value, see more for the encoding in mannual.
+    4). csr:xtval is written with trap value, usually the pc where trap is happening.
+    5). csr:xstatus.xpp is written with current privilege mode.
+    6). adjust current privilege to x
+    7). csr:xstatus.xpie is written with xstatus.xie
+    8). csr:xstatus.xie is written with zero.
+    9). pc is written with value from csr:xtvec. see more for encoding in mannual.
+    
+another critical step is:
+    10). flush translation cach, because privilege mode changes and paging may change thus address space changes.
+
+
+returning from trap is done via privileged instructions: sret or mret.
+the hypervisor does opposite work, for example, pc is written with xepc. all it does is to recover the cpu to the previous state before the trap happens.
+        </pre> 
+        
+</body>
+</html>
+
