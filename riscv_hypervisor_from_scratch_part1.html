@@ -27,7 +27,7 @@ x86_64. the core function is to dynamically translate in-memory risc-v instructi
 This is the first time for me to do something with DBT, from the very beginning, efficiency is not my goal, intead, my top priority is to make
 it wor. Fortunately, it works just fine after much effort in debug and resolutin eventually.
 
-I) Register Representation
+1) Register Representation
    we have 32 + 1 general purpose registers in risc-v ISA, but we have less regsters in x86_64(R[A-D]X, RSI, RDI, RBP, RSP, R[8-15]). so during translation
    process, we can not simpliy map all risc-v registers to x86_64 registers. As far as I know, some hyperisors like rv8 map mostly-used risc-v registers to 
    x86_64 registers while leaving others in memory.
@@ -90,7 +90,7 @@ I) Register Representation
 
    when the translation cahce is full, the translation process flushes the cache, we have 16K translation cache by default. 
 
-2) Run Process
+3) Run Process
    another process after translation is to run translated code.
    below is the flow diagram of how to run the translated code:
 
@@ -127,7 +127,7 @@ I) Register Representation
                                                 +-------------------------------------------------------+
 
     translation process is restarted when the next instruction to execute is not in translation cache.  accorss the run process, there are four x86_64
-    registers are reserverd for specical use as you can find in the diagram, and each time before we go furthrt into translation cache code, we fill 
+    registers reserverd for specical use as you can find in the diagram, and each time before we go furthrt into translation cache code, we fill 
     these registers with right values.
 
     the translation cache code can jump out to vmm in certain cases, to avoid stack exhaustion, we have to update the stack to a fixed value, and then do rest

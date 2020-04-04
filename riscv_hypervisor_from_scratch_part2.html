@@ -1,0 +1,101 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>RISC-V Emulation From Scratch - Part II: Memory Management Unit</h3>
+              <p><b>Synopsis</b>: This article gives a brief introduction to how MMU is emulated in my hypervisor</p>
+              <p><b>Keywords</b>: mmu, softmmu</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+In RISC-V, paging is controlled via csr: Supervisor Address Translation and Protection(SATP), it support four paging mode: No paging, sv32, sv39 and sv48.
+they diff in many ways including virtual address width. in rv32, only sv32 paging mode is supported and it's the mode we have impleented in my hypervisor.
+
+in sv32, the width of virtual address is 32bit, however, the physical address width is 34 bits, this means we can address physical address range [0 - 16GB], if I
+am not wrong, in x86, only PXE is enabled, addressing range can be greater than 4GB.
+
+in sv32, there are two kinds of pages, 4K pages and 4M megapages. this is very much similar to x86, for 4M pages, there is only one tier of page table while
+others have two tiers.
+
+MMU is a necessity in a system which suports virtual memory, mmu consists of translation lookaside buffer (TLB) and pagewalker. 
+TLB is a page table shadow which accelerates address translation for recently accessed memory addresses, thus avoiding accessing sparse in-memory page tables
+which is very slow. when an entry is not in TLB, page walker is restarted to walk through the whole page table, fill the TLB if found, otherwise raise 
+paging exceptions to CPU.
+
+below the structure of TLB.
+
+    Virtual Address
+    +-----------------------------------------------------------------+
+    |   VPN1[10]            ||   VPN0[10]         ||   offset[12]     |
+    +-----------------------------------------------------------------+
+
+
+
+    +-----------------------------------------------------------------------------------------------------------+
+    | TLB                                                                                                       |
+    |                                                                                                           |
+    |                                                                                                           |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |  0   |  va_tag   || pa_tag   ||  mask   ||  valid   ||  level1_pte  ||  level2_pte    ||  operation     | |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |                                                                                                           |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |  1   |  va_tag   || pa_tag   ||  mask   ||  valid   ||  level1_pte  ||  level2_pte    ||  operation     | |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |                                                                                                           |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |  2   |  va_tag   || pa_tag   ||  mask   ||  valid   ||  level1_pte  ||  level2_pte    ||  operation     | |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |                                                                                                           |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |  3   |  va_tag   || pa_tag   ||  mask   ||  valid   ||  level1_pte  ||  level2_pte    ||  operation     | |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |                                                                                                           |
+    |                                             .. ... ... ... ..                                             |
+    |                                                                                                           |
+    |                                                                                                           |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |   n  |  va_tag   || pa_tag   ||  mask   ||  valid   ||  level1_pte  ||  level2_pte    ||  operation     | |
+    |      +--------------------------------------------------------------------------------------------------+ |
+    |                                                                                                           |
+    +-----------------------------------------------------------------------------------------------------------+
+
+
+in translation, we first search to see whether there is a legetimate 4M tlb entry, if not found, we continue to search 4K tlb entry.
+more specifically, below is the steps to search 4MB entry:
+ 1)  tlb entry index = VPN1 % n
+ 2)  test whether mask is for 4MB pages
+ 3)  if not, give up search and continue to seach 4K entry.
+ 4)  if VPN1 & mask == va_tag; great, we found the translation entry, compose the physcal address: pa_tag | offset.
+ 5)  else, we give up.
+
+To search 4K entry:
+ 1) calculate entry index: VPN0 % n
+ 2) test whether mask is for 4K pages. 
+ 3) test va_tag equality : (vpn1-vpn0) & mask == va_tag.
+ 4) other steps are similar except we will run page walker if we can not find a good entry in tlb.
+
+
+level1_pte and level2_pte used for manipulating page tables in memory, for example, if a page is accessed, the paging entry in page tables is marked as accessed.
+operation is an interface to actually access a memory backing: main memory or io memory.
+
+TLB is not shared among harts, even a hart can have two TLBs, one for instruction: iTLB and one for data: dTLB.
+
+        </pre> 
+
+</body>
+</html>
+
