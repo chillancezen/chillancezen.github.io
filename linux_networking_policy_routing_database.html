@@ -1,0 +1,126 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>Linux Networking - Policy Routing Database</h3>
+              <p><b>Synopsis</b>: Linux networking: policy routing</p>
+              <p><b>Keywords</b>: Linux networking, policy routing</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+Linux policy routing is supported via a policy rule database. In the database there are several tables which have their own priorities(TABLE_ID is an eight bit integer).
+the less the TABLE_ID is, the higher its priority is.
+
+you are able to see the full rules list via the following command:
+$ip rule list
+0:	from all lookup local
+32766:	from all lookup main
+32767:	from all lookup default
+
+you can also specify table's alias to make it looks more meanningful by editing the /etc/iproute2/rt_tables. 
+
+when kernel is making route decisions, it first looks up the rule database basing on its packet characteristics to match a specific table, and then do routing
+inside that table.
+****. Policy strutcture. 
+    There are couple of criterias for you to match your traffic patterns. for example, you want to direct the traffic flows with source port 8080 to 
+    an asymmetric gateway 130.140.150.100 as next hop, and this violates the routes in you main table. so you can create a rule table to do customized routing yourself:
+        $sudo ip rule add sport 8080 table 100
+        $sudo ip route add default via 130.140.150.100 table 100 
+    
+    besides, there are other selectors for you to create rules, below is the syntax:
+    SELECTOR := [ not ] [ from PREFIX ] [ to PREFIX ] [ tos TOS ] [ fwmark FWMARK[/MASK] ]
+            [ iif STRING ] [ oif STRING ] [ pref NUMBER ] [ l3mdev ]
+            [ uidrange NUMBER-NUMBER ]
+            [ ipproto PROTOCOL ]
+            [ sport [ NUMBER | NUMBER-NUMBER ]
+            [ dport [ NUMBER | NUMBER-NUMBER ] ]
+****.A case of asymmetric routing.
+     the topology diagram is given as below:
+               +---------------------------------------------------------+
+               | Host(default namespace)                                 |
+               |                                                         |
+               |        +-----------------------------------+            |
+               |        |ns_demo       (web service:8080)   |            |
+               |        |      10.0.0.2/24                  |            |
+               |        |        +            172.13.14.2/24|            |
+               |        |        |                 ^        |            |
+               |        |        |                 |        |            |
+               |        |        |                 |        |            |
+               |        +-----------------------------------+            |
+               |                 |                 |                     |
+               |                 |                 |                     |
+               |            Downstream Link        | Upstream Link       |
+               |                 |                 |                     |
+               |                 v                 |                     |
+               |           10.0.0.1/24             |                     |
+               |                                   +                     |
+               |                                   172.13.14.1/24        |
+               |                                                         |
+               +---------------------------------------------------------+
+     traffic from the host to the namespace flows via upstream link, the reponse follows another path. here are steps to present the demo:
+        $sudo ip netns add ns_demo
+        $sudo ip link add name if_uplink_host type veth peer if_uplink_demo
+        $sudo ip link set if_uplink_host up
+        $sudo ip link set if_uplink_demo netns ns_demo
+        $sudo ip netns exec ns_demo ip link set if_uplink_demo up
+        $sudo ip addr add 172.13.14.1/24 dev if_uplink_host
+        $sudo ip netns exec ns_demo ip addr add 172.13.14.2/24 dev if_uplink_demo
+    now the upstream link is ready, you are able to test the connectivity between two namespaces. let setup downstream link.
+        $sudo ip link add name if_dnlink_host type veth peer if_dnlink_demo
+        $sudo ip link set if_dnlink_host up
+        $sudo ip link set if_dnlink_demo netns ns_demo
+        $sudo ip netns exec ns_demo ip link set if_dnlink_demo up
+        $sudo ip addr add 10.0.0.1/24 dev if_dnlink_host
+        $sudo ip netns exec ns_demo ip addr add 10.0.0.2/24 dev if_dnlink_demo
+    Now downstream link is also ready, the are two routes in ns_demo's main table:
+        $sudo ip netns exec ns_demo ip route show table main
+        10.0.0.0/24 dev if_dnlink_demo proto kernel scope link src 10.0.0.2
+        172.13.14.0/24 dev if_uplink_demo proto kernel scope link src 172.13.14.2
+    That's quite expected. next we are going to configure the policy:
+        $sudo ip netns exec ns_demo ip rule add sport 8080 table 100
+        $sudo ip netns exec ns_demo ip route add default via 10.0.0.1 dev if_dnlink_demo table 100
+    To verify by starting a web service on port 8080:
+        $sudo ip netns exec ns_demo ip route show table 100
+        default via 10.0.0.1 dev if_dnlink_demo
+        $sudo ip netns exec ns_demo python3 -m http.server 8080
+
+    Finally, we are going to capture packets:
+        $sudo tcpdump -i if_uplink_host -n
+        tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+        listening on if_uplink_host, link-type EN10MB (Ethernet), capture size 262144 bytes
+        11:48:44.343015 IP 172.13.14.1.58964 > 172.13.14.2.8080: Flags [S], seq 138105168, win 64240, options [mss 1460,sackOK,TS val 2458541685 ecr 0,nop,wscale 7], length 0
+        11:48:44.343059 IP 172.13.14.1.58964 > 172.13.14.2.8080: Flags [.], ack 2845715807, win 502, options [nop,nop,TS val 2458541685 ecr 2638739449], length 0
+        11:48:44.343251 IP 172.13.14.1.58964 > 172.13.14.2.8080: Flags [P.], seq 0:143, ack 1, win 502, options [nop,nop,TS val 2458541685 ecr 2638739449], length 143: HTTP: GET / HTTP/1.1
+        11:48:44.344793 IP 172.13.14.1.58964 > 172.13.14.2.8080: Flags [.], ack 156, win 501, options [nop,nop,TS val 2458541686 ecr 2638739450], length 0
+        11:48:44.344855 IP 172.13.14.1.58964 > 172.13.14.2.8080: Flags [.], ack 1645, win 494, options [nop,nop,TS val 2458541686 ecr 2638739450], length 0
+        11:48:44.346043 IP 172.13.14.1.58964 > 172.13.14.2.8080: Flags [F.], seq 143, ack 1646, win 501, options [nop,nop,TS val 2458541688 ecr 2638739450], length 0
+
+        $sudo tcpdump -i if_dnlink_host -n
+        tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+        listening on if_dnlink_host, link-type EN10MB (Ethernet), capture size 262144 bytes
+        11:48:44.343043 IP 172.13.14.2.8080 > 172.13.14.1.58964: Flags [S.], seq 2845715806, ack 138105169, win 65160, options [mss 1460,sackOK,TS val 2638739449 ecr 2458541685,nop,wscale 7], length 0
+        11:48:44.343266 IP 172.13.14.2.8080 > 172.13.14.1.58964: Flags [.], ack 144, win 508, options [nop,nop,TS val 2638739449 ecr 2458541685], length 0
+        11:48:44.344777 IP 172.13.14.2.8080 > 172.13.14.1.58964: Flags [P.], seq 1:156, ack 144, win 508, options [nop,nop,TS val 2638739450 ecr 2458541685], length 155: HTTP: HTTP/1.0 200 OK
+        11:48:44.344851 IP 172.13.14.2.8080 > 172.13.14.1.58964: Flags [P.], seq 156:1645, ack 144, win 508, options [nop,nop,TS val 2638739450 ecr 2458541686], length 1489: HTTP
+        11:48:44.344892 IP 172.13.14.2.8080 > 172.13.14.1.58964: Flags [F.], seq 1645, ack 144, win 508, options [nop,nop,TS val 2638739450 ecr 2458541686], length 0
+        11:48:44.346067 IP 172.13.14.2.8080 > 172.13.14.1.58964: Flags [.], ack 145, win 508, options [nop,nop,TS val 2638739452 ecr 2458541688], length 0
+
+    SEE!, the TCP stream is splitted unidirectionally on two links. 
+        </pre> 
+        
+</body>
+</html>
+
