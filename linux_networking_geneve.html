@@ -1,0 +1,62 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Welcome to Jie Zheng's blog</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Jie Zheng">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+        <header class="clearfix">
+            <div id="info">
+              <h3>Linux Networking - Geneve tunnelling</h3>
+              <p><b>Synopsis</b>: A geneve tunnelling case</p>
+              <p><b>Keywords</b>: GENEVE</p>
+              <p><a href="index.html">Back To Blog HomePage</a></p>
+          </div>        
+
+        </header>
+        
+        <hr>
+        <pre>
+Like VXLAN, GENEVE tunneling is to extend L2 domain accross L3 network. It utilizes L2 Over UDP encapsulation to
+maximize host end concurrency capability via RSS.
+
+GENEVE is more flexible than VXLAN becase it provides additional TLV options to extend your business while fulfilling all
+the functions that VXLAN is able to do.
+
+here is an example to create a genevel endpoint and a tunnel:
+    	 sudo modprobe geneve
+         sudo ip netns add netA
+         sudo ip netns add netB
+         sudo ip netns exec netA ip link set lo up
+         sudo ip netns exec netB ip link set lo up
+         sudo ip link add name underlayA type veth peer underlayB
+         sudo ip link set dev underlayA netns netA
+         sudo ip link set dev underlayB netns netB
+         sudo ip netns exec netA ip link set dev underlayA up
+         sudo ip netns exec netB ip link set dev underlayB up
+         sudo ip netns exec netA ip addr add 10.1.1.1/24 dev underlayA
+         sudo ip netns exec netB ip addr add 10.1.1.2/24 dev underlayB
+         sudo ip netns exec netA ip link add name gretapA type gretap local 10.1.1.1 remote 10.1.1.2
+         sudo ip netns exec netB ip link add name gretapB type gretap local 10.1.1.2 remote 10.1.1.1
+
+         sudo ip netns exec netA ip link add name geneveA type geneve id 50700 remote 10.1.1.2 dstport 5070
+         sudo ip netns exec netB ip link add name geneveB type geneve id 50700 remote 10.1.1.1 dstport 5070
+
+         sudo ip netns exec netA ip link set geneveA up
+         sudo ip netns exec netB ip link set geneveB up
+
+         sudo ip netns exec netA ip addr add 192.100.100.1/24 dev geneveA
+         sudo ip netns exec netB ip addr add 192.100.100.2/24 dev geneveB
+
+Note in Linux, the default udp port is 6081. you can override it.
+REF: https://tools.ietf.org/html/draft-ietf-nvo3-geneve-08
+
+        </pre> 
+        
+</body>
+</html>
+
